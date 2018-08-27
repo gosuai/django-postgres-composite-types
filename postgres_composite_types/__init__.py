@@ -354,11 +354,6 @@ class CompositeTypeMeta(type):
                     "the migration to register it has not run yet",
                     cls.__name__)
 
-        # Disconnect the signal now - only need to register types on the
-        # initial connection
-        connection_created.disconnect(cls.database_connected,
-                                      dispatch_uid=cls._meta.db_type)
-
 
 # pylint:disable=invalid-name
 composite_type_created = Signal()
