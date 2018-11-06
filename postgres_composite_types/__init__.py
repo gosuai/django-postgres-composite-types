@@ -46,6 +46,7 @@ from django.db.backends.postgresql.base import \
     DatabaseWrapper as PostgresDatabaseWrapper
 from django.db.backends.signals import connection_created
 from django.dispatch import Signal
+from django.utils.encoding import is_protected_type
 from psycopg2 import ProgrammingError
 from psycopg2.extensions import ISQLQuote, adapt, register_adapter
 from psycopg2.extras import CompositeCaster, register_composite
@@ -170,8 +171,11 @@ class BaseField(models.Field):
         """
         value = self.value_from_object(obj)
         return json.dumps({
-            name: field.value_to_string(value)
-            for name, field in self.Meta.fields
+            name: (
+                field.value_from_object(value)
+                if is_protected_type(field.value_from_object(value))
+                else field.value_to_string(value)
+            ) for name, field in self.Meta.fields
         })
 
 
